@@ -28,6 +28,13 @@ class _ExifEditorState extends State<ExifEditor> {
   String searchKeyword = "_HDR";
   String folderPath = "/storage/emulated/0/DCIM/Camera";
   List<String> logMessages = [];
+  final TextEditingController folderPathController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    folderPathController.text = folderPath;
+  }
 
   void addLog(String message) {
     setState(() {
@@ -66,6 +73,7 @@ class _ExifEditorState extends State<ExifEditor> {
     final files = directory.listSync();
 
     for (var file in files) {
+      addLog(file.path);
       if (file is File &&
           file.path.contains(searchKeyword) &&
           (file.path.endsWith(".jpg") || file.path.endsWith(".jpeg"))) {
@@ -105,6 +113,19 @@ class _ExifEditorState extends State<ExifEditor> {
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: folderPathController,
+              decoration: InputDecoration(
+                labelText: 'Folder Path',
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) {
+                folderPath = value;
+              },
+            ),
+          ),
           ElevatedButton(
             onPressed: processImages,
             child: Text('Update Exif Data'),
