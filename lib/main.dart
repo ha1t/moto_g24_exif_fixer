@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:native_exif/native_exif.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:path/path.dart' as path;
 
 void main() {
   runApp(MyApp());
@@ -34,6 +36,18 @@ class _ExifEditorState extends State<ExifEditor> {
   void initState() {
     super.initState();
     folderPathController.text = folderPath;
+    requestPermissions();
+  }
+
+  Future<void> requestPermissions() async {
+    final readPermission = await Permission.storage.request();
+    final writePermission = await Permission.manageExternalStorage.request();
+
+    if (!readPermission.isGranted || !writePermission.isGranted) {
+      addLog("ストレージの読み書き権限が拒否されました");
+    } else {
+      addLog("ストレージの読み書き権限が許可されました");
+    }
   }
 
   void addLog(String message) {
@@ -42,19 +56,20 @@ class _ExifEditorState extends State<ExifEditor> {
     });
   }
 
-  Future<void> updateExifData(String path) async {
+  Future<void> updateExifData(String filePath) async {
     try {
       // Exifデータを読み取る
-      final exif = await Exif.fromPath(path);
+      final exif = await Exif.fromPath(filePath);
+      final fileName = path.basename(filePath);
       final dateTimeOriginal = await exif.getAttribute('DateTimeOriginal');
-      if (dateTimeOriginal == null) {
-        addLog("Exifデータが見つかりません: $path");
+      if (dateTimeOriginal != null) {
+        addLog("Skip: $fileName");
         return;
       }
 
-      String newDateTime = extractDateFromFileName(path);
+      String newDateTime = extractDateFromFileName(filePath);
       if (newDateTime.isEmpty) {
-        addLog("ファイル名から日時を取得できません: $path");
+        addLog("ファイル名から日時を取得できません: $fileName");
         return;
       }
 
@@ -62,7 +77,7 @@ class _ExifEditorState extends State<ExifEditor> {
       await exif.writeAttribute('DateTimeOriginal', newDateTime);
       await exif.close();
 
-      addLog("Exifデータを更新しました: $path");
+      addLog("Update: $fileName");
     } catch (e) {
       addLog("Exifデータの更新に失敗しました: $e");
     }
@@ -73,7 +88,6 @@ class _ExifEditorState extends State<ExifEditor> {
     final files = directory.listSync();
 
     for (var file in files) {
-      addLog(file.path);
       if (file is File &&
           file.path.contains(searchKeyword) &&
           (file.path.endsWith(".jpg") || file.path.endsWith(".jpeg"))) {
