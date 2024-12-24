@@ -27,6 +27,13 @@ class ExifEditor extends StatefulWidget {
 class _ExifEditorState extends State<ExifEditor> {
   String searchKeyword = "_HDR";
   String folderPath = "/storage/emulated/0/DCIM/Camera";
+  List<String> logMessages = [];
+
+  void addLog(String message) {
+    setState(() {
+      logMessages.add(message);
+    });
+  }
 
   Future<void> updateExifData(String path) async {
     try {
@@ -34,13 +41,13 @@ class _ExifEditorState extends State<ExifEditor> {
       final exif = await Exif.fromPath(path);
       final dateTimeOriginal = await exif.getAttribute('DateTimeOriginal');
       if (dateTimeOriginal == null) {
-        print("Exifデータが見つかりません: $path");
+        addLog("Exifデータが見つかりません: $path");
         return;
       }
 
       String newDateTime = extractDateFromFileName(path);
       if (newDateTime.isEmpty) {
-        print("ファイル名から日時を取得できません: $path");
+        addLog("ファイル名から日時を取得できません: $path");
         return;
       }
 
@@ -48,9 +55,9 @@ class _ExifEditorState extends State<ExifEditor> {
       await exif.writeAttribute('DateTimeOriginal', newDateTime);
       await exif.close();
 
-      print("Exifデータを更新しました: $path");
+      addLog("Exifデータを更新しました: $path");
     } catch (e) {
-      print("Exifデータの更新に失敗しました: $e");
+      addLog("Exifデータの更新に失敗しました: $e");
     }
   }
 
@@ -65,7 +72,7 @@ class _ExifEditorState extends State<ExifEditor> {
         await updateExifData(file.path);
       }
     }
-    print("処理完了");
+    addLog("処理完了");
   }
 
   String extractDateFromFileName(String fileName) {
@@ -94,13 +101,25 @@ class _ExifEditorState extends State<ExifEditor> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Exif Fixer'),
+        title: Text('Exif Editor'),
       ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: processImages,
-          child: Text('Update Exif Data'),
-        ),
+      body: Column(
+        children: [
+          ElevatedButton(
+            onPressed: processImages,
+            child: Text('Update Exif Data'),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: logMessages.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(logMessages[index]),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
