@@ -27,7 +27,7 @@ class ExifEditor extends StatefulWidget {
 }
 
 class _ExifEditorState extends State<ExifEditor> {
-  String searchKeyword = "_HDR";
+  List<String> searchKeywords = ["_HDR", "_MFNR"];
   String folderPath = "/storage/emulated/0/DCIM/Camera";
   List<String> logMessages = [];
   final TextEditingController folderPathController = TextEditingController();
@@ -79,8 +79,12 @@ class _ExifEditorState extends State<ExifEditor> {
 
       addLog("Update: $fileName");
     } catch (e) {
-      addLog("Exifデータの更新に失敗しました: $e");
+      addLog("エラーが発生しました: $e");
     }
+  }
+
+  bool containsSearchKeyword(String fileName) {
+    return searchKeywords.any((keyword) => fileName.contains(keyword));
   }
 
   Future<void> processImages() async {
@@ -89,7 +93,7 @@ class _ExifEditorState extends State<ExifEditor> {
 
     for (var file in files) {
       if (file is File &&
-          file.path.contains(searchKeyword) &&
+          containsSearchKeyword(file.path) &&
           (file.path.endsWith(".jpg") || file.path.endsWith(".jpeg"))) {
         await updateExifData(file.path);
       }
@@ -123,7 +127,7 @@ class _ExifEditorState extends State<ExifEditor> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Exif Editor'),
+        title: Text('Moto G24 Exif Fixer'),
       ),
       body: Column(
         children: [
