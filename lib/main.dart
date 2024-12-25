@@ -27,7 +27,7 @@ class ExifEditor extends StatefulWidget {
 }
 
 class _ExifEditorState extends State<ExifEditor> {
-  List<String> searchKeywords = ["_HDR", "_MFNR"];
+  List<String> searchKeywords = ["_HDR", "_MFNR_PORTRAIT"];
   String folderPath = "/storage/emulated/0/DCIM/Camera";
   List<String> logMessages = [];
   final TextEditingController folderPathController = TextEditingController();
@@ -40,10 +40,11 @@ class _ExifEditorState extends State<ExifEditor> {
   }
 
   Future<void> requestPermissions() async {
-    final readPermission = await Permission.storage.request();
+    // final readPermission = await Permission.storage.request();
     final writePermission = await Permission.manageExternalStorage.request();
 
-    if (!readPermission.isGranted || !writePermission.isGranted) {
+    //if (!readPermission.isGranted || !writePermission.isGranted) {
+    if (!writePermission.isGranted) {
       addLog("ストレージの読み書き権限が拒否されました");
     } else {
       addLog("ストレージの読み書き権限が許可されました");
