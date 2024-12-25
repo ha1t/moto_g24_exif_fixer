@@ -1,16 +1,5 @@
-# hdr_exif_fixer
+# Moto G24 EXIF Fixer
 
-A new Flutter project.
+Motolora Moto G24 は、HDRやポートレートモードで撮影するとなぜかEXIF内の撮影日時（DateTimeOriginal）が消滅するため、
+撮影日時が存在しない写真を対象にファイル名を元に撮影日時を書き込むアプリです。
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
