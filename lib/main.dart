@@ -27,7 +27,7 @@ class ExifEditor extends StatefulWidget {
 }
 
 class _ExifEditorState extends State<ExifEditor> {
-  List<String> searchKeywords = ["_HDR", "_MFNR_PORTRAIT"];
+  List<String> searchKeywords = ["_HDR", "_MFNR_PORTRAIT", "_SR"];
   String folderPath = "/storage/emulated/0/DCIM/Camera";
   List<String> logMessages = [];
   final TextEditingController folderPathController = TextEditingController();
